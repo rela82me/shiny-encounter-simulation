@@ -76,3 +76,5 @@ while len(shiny_dex) < len(MASTER_DEX_LIST):
     encounter()
 
 output_results()
+
+# %%
