@@ -2,6 +2,8 @@
 import random as rand
 import pandas as pd
 import json
+import sys
+import time
 
 # Open data, with proper encoding for weird text doh.
 with open('pokedex.json', 'r', encoding='utf-8') as f:
@@ -88,7 +90,6 @@ def encounter():
         normal_dex.add(encountered_pokemon)
         normal_box_counts[encountered_pokemon] = normal_box_counts.get(
             encountered_pokemon, 0) + 1
-        print(f"Caught: {encountered_pokemon} | Encounter: {total_encounter}")
 
 
 def output_results():
@@ -113,10 +114,26 @@ def output_results():
 # should output in loop which pokemon is being encountered. This will give the user something to look at.
 # Start Encounter > Random Pokemon > Is it Shiny? > If yes: Add to shiny box | If no: Add to regular box > New Encounter
 
-while len(shiny_dex) < len(POKEDEX):
-    # Encounter Logic/logpoint
-    encounter()
+start_time = time.time()
+print("Starting Shiny Pokemon Encounter Simulation...")
+print("Press Ctrl+C to stop the simulation early.")
+try:
+    while len(shiny_dex) < len(POKEDEX):
+        encounter()
+        if total_encounter % 1000 == 0:
+            percentage_shiny = (len(shiny_dex)/len(POKEDEX)) * 100
+            percentage_normal = (len(normal_dex)/len(POKEDEX)) * 100
+            print (f"Encounters: {total_encounter:,} | Shinies Caught: {len(shiny_box_counts)}/ {len(POKEDEX)} ({percentage_shiny:.2f}%) | Normals Caught: {len(normal_box_counts)/len(POKEDEX)} ({percentage_normal:.2f}%)", end='\r')
+        sys.stdout.flush()
+except KeyboardInterrupt:
+    print("\nSimulation stopped by user.")
 
+end_time = time.time()
+
+total_seconds = end_time - start_time
+total_minutes = total_seconds / 60
+print(f"\nTotal Simulation Time: {total_minutes:.2f} minutes")
+    
 output_results()
 
 # %%
