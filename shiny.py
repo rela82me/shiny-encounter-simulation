@@ -8,10 +8,51 @@ with open('pokedex.json', 'r', encoding='utf-8') as f:
     pokedex_data = json.load(f)
 
 # Create list & Dictionary
-MASTER_DEX_LIST = pokedex_data["master_dex_list"]
-NAME_TO_NUMBER_DEX = pokedex_data["name_to_number_dex"]
 total_encounter = 0
 
+#Setting up the Data Structures
+
+POKEDEX = {}
+spawnrate_weights = {
+    "Slow": 0.1,
+    "Medium Slow": 0.25,
+    "Medium Fast": 0.35,
+    "Fast": 0.5,
+    "Fluctuating": 0.7,
+    "Erratic": .9
+}
+list_of_pokemon = pokedex_data['Pokedex']
+
+#Create the master pokedex in a dictionary with the key of the pokemons name for lookup purposes later. 
+for pokemon in list_of_pokemon: 
+    pokemon_name = pokemon['name']
+
+    pokemon_stats = {}
+    
+    pokemon_stats['pokedex number'] = pokemon['pokedex number']
+    pokemon_stats['Catch Rate'] = pokemon['Catch Rate']
+    pokemon_stats['Experience Type'] = pokemon['Experience Type']
+    
+    experience_type = pokemon['Experience Type']
+    spawn_weight = spawnrate_weights[experience_type]
+
+    pokemon_stats['Spawn Weight'] = spawn_weight
+    
+    POKEDEX[pokemon_name] = pokemon_stats
+
+#loop through the pokedex to create two lists for the pokemon and spawn weights. 
+#This is to feed rand the format of data it needs since they will be in corresponding positions within 
+
+pokemon_for_encountering = []
+spawn_weights =[]
+
+for pokemon in POKEDEX:
+    pokemon_details = POKEDEX[pokemon]
+    pokemon_spawn_weight = pokemon_details['Spawn Weight']
+    
+    pokemon_for_encountering.append(pokemon)
+    spawn_weights.append(pokemon_spawn_weight) 
+    
 # Main set that is used to determine unique shiny encounters. Set's only allow unique identifiers,
 # so encounters added here will automatically be new.
 shiny_dex = set()
@@ -21,29 +62,20 @@ normal_dex = set()
 normal_box_counts = {}
 shiny_box_counts = {}
 
-spawnrate_weights = {
-    "Slow": 0.1,
-    "Medium Slow": 0.25,
-    "Medium Fast": 0.35,
-    "Fast": 0.5,
-    "Fluctuating": 0.7,
-    "Erratic": .9
-}
+
 
 # Variables/Constants
 SHINY_RATE = (1 / 4096)
 
-
-
+# block changed to markdown so simulation doesn't run. 
 # functions needed: encounter
-
 
 def encounter():
     global total_encounter
     total_encounter += 1
 
     # Encounter Logic
-    encountered_pokemon = rand.choice(MASTER_DEX_LIST)
+    encountered_pokemon = rand.choices(pokemon_for_encountering, weights=spawn_weights, k=1)[0]
     is_shiny = rand.random() < SHINY_RATE
 
     if is_shiny:
@@ -81,7 +113,7 @@ def output_results():
 # should output in loop which pokemon is being encountered. This will give the user something to look at.
 # Start Encounter > Random Pokemon > Is it Shiny? > If yes: Add to shiny box | If no: Add to regular box > New Encounter
 
-while len(shiny_dex) < len(MASTER_DEX_LIST):
+while len(shiny_dex) < len(POKEDEX):
     # Encounter Logic/logpoint
     encounter()
 
