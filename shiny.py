@@ -21,9 +21,19 @@ normal_dex = set()
 normal_box_counts = {}
 shiny_box_counts = {}
 
+spawnrate_weights = {
+    "Slow": 0.1,
+    "Medium Slow": 0.25,
+    "Medium Fast": 0.35,
+    "Fast": 0.5,
+    "Fluctuating": 0.7,
+    "Erratic": .9
+}
 
 # Variables/Constants
 SHINY_RATE = (1 / 4096)
+
+
 
 # functions needed: encounter
 
