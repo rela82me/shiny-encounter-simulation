@@ -1,89 +1,50 @@
 # Shiny Pokémon Encounter Simulator
 
-This project is a Python-based command-line application that simulates the experience of hunting for shiny Pokémon. It goes beyond a simple encounter counter by incorporating a detailed rarity system, catch mechanics, resource management, and comprehensive statistical reporting.
+A command-line Python application that simulates the process of hunting for a complete shiny Pokédex. This script uses weighted encounter and catch rates based on in-game data to provide a more realistic and engaging simulation.
 
 ## Features
 
-- **Rarity-Based Encounters**: Pokémon don't all appear equally. The simulation uses a weighted system based on defined rarities (`Common`, `Uncommon`, `Rare`, `Very Rare`, `Legendary`) to provide a more realistic distribution of encounters.
-- **Dynamic Catch & Run Mechanics**: Finding a shiny is only half the battle! Each shiny encounter initiates a catch sequence. The probability of catching the Pokémon and the chance it will flee after a failed attempt are tied directly to its rarity.
-- **Resource Tracking**: The simulation tracks the number of Pokéballs used, adding a layer of resource management to the hunt.
-- **Two Simulation Modes**:
-  1.  **Fixed Encounters**: Run the simulation for a predetermined number of encounters to see what you can find.
-  2.  **Target Hunting**: Set a specific Pokémon as your target, and the simulation will run until that shiny is successfully caught.
-- **Detailed Final Report**: At the end of each simulation, a full report is generated, including:
-  - Total simulation time.
-  - Total encounters and Pokéballs used.
-  - A breakdown of shinies found, caught, and those that fled.
-  - Calculated metrics like average encounters per shiny and Pokéballs per catch.
-  - A log of every shiny Pokémon successfully caught.
-- **Data-Driven**: All Pokémon data, including names, Pokédex numbers, and rarities, is loaded from an easily editable `pokedex.json` file.
+- **Data-Driven**: All Pokémon data is generated from the `Pokemon Stats.xlsx - Stats.csv` file, making it easy to update and manage.
+- **Weighted Encounters**: Pokémon spawn rates are not equal. The simulation uses the "Experience Type" (e.g., Slow, Medium Fast, Fast) to create a weighted probability for each encounter.
+- **Catch Mechanics**: When a shiny Pokémon is encountered, the simulation uses its specific "Catch Rate" to determine if the Pokémon is successfully caught or if it flees.
+- **Live Progress Tracking**: The terminal displays a clean, single-line progress bar that updates periodically without flooding the screen. It shows total encounters, unique shinies caught, total shinies caught, and the simulation's duration.
+- **Unique Shiny Alerts**: The script prints a special, high-visibility message only when a _new, unique_ shiny Pokémon is caught, making each new addition to the Pokédex an exciting event.
+- **Automatic Report Generation**: Upon completion or interruption, the script creates a `reports` folder and saves timestamped CSV files (`normal_encounters_{timestamp}.csv` and `shiny_encounters_{timestamp}.csv`) with a full summary of the simulation.
 
 ## How It Works
 
-The simulation is driven by the `shiny.py` script.
+The project is split into two main Python scripts:
 
-1.  **Initialization**: The script loads all Pokémon data and their rarities from `pokedex.json`. It then creates a weighted list of possible encounters.
-2.  **Encounter Loop**: The script enters a loop, either for a fixed number of encounters or until a target is caught.
-3.  **Spawning**: In each iteration, a Pokémon is randomly chosen from the weighted list.
-4.  **Shiny Check**: A random roll is performed against the `SHINY_CHANCE` to determine if the encountered Pokémon is shiny.
-5.  **Catch Sequence**: If a shiny appears, the script simulates throwing Pokéballs. Each throw has a chance to succeed or fail based on the Pokémon's rarity. If a throw fails, the Pokémon has a chance to run away.
-6.  **Reporting**: Once the simulation's end condition is met, it calculates and prints a final, detailed report of the entire hunt.
+1.  **`makelist.py` (Data Preparation)**: This script reads the raw data from `Pokemon Stats.xlsx - Stats.csv`, selects the necessary columns (`name`, `pokedex number`, `Catch Rate`, `Experience Type`), and generates the clean `pokedex.json` file that the main simulator uses.
 
-## Project Files
+2.  **`shiny.py` (The Simulator)**:
+    - Loads the `pokedex.json` data into a master `POKEDEX` dictionary.
+    - Calculates numerical spawn weights for each Pokémon based on their "Experience Type".
+    - Prepares two lists: one of all Pokémon names and a corresponding list of their spawn weights for the encounter logic.
+    - Enters a loop that runs until one of every Pokémon has been caught as a shiny.
+    - Inside the loop, it uses `random.choices()` to simulate a weighted encounter.
+    - For each encounter, it rolls for a shiny chance (1 in 4096).
+    - If a shiny is found, it then simulates a catch attempt based on that Pokémon's specific catch rate.
+    - If the catch is successful, it checks if it's a new shiny and prints the appropriate message.
 
-- **`shiny.py`**: The main executable script that contains all the simulation logic. Key parameters can be configured at the top of this file.
-- **`pokedex.json`**: A JSON database containing all the Pokémon. Each entry includes the Pokémon's ID and its assigned rarity, which dictates its spawn rate and catch difficulty.
+## How to Run
 
-## How to Use
+1.  **Install Dependencies**: Ensure you have the required Python libraries. You can install them using pip:
 
-### Prerequisites
-
-- Python 3.x
-
-### Running the Simulation
-
-1.  **Clone or download the repository.** Make sure `shiny.py` and `pokedex.json` are in the same directory.
-
-2.  **Configure the Simulation (Optional)**:
-    Open `shiny.py` in a text editor and modify the configuration variables at the top of the file to customize your hunt.
-
-    ```python
-    # --- CONFIGURATION ---
-    POKEDEX_FILE = 'pokedex.json'
-    # Set the total number of encounters for the simulation (if not hunting a target)
-    SIMULATION_ENCOUNTERS = 100_000
-    # Set to a Pokémon name to hunt for it, or None to run for SIMULATION_ENCOUNTERS
-    TARGET_POKEMON = "Mewtwo"
-    # The base chance of finding a shiny
-    SHINY_CHANCE = 1 / 4096
+    ```bash
+    pip install pandas
     ```
 
-3.  **Execute the script** from your terminal:
+2.  **Generate Pokémon Data**: If you have made any changes to the `Pokemon Stats.xlsx - Stats.csv` file, you must run the data preparation script first to update the `pokedex.json` file.
+
+    ```bash
+    python makelist.py
+    ```
+
+3.  **Run the Simulation**: Start the main simulation script from your terminal.
 
     ```bash
     python shiny.py
     ```
 
-4.  **View the Results**: Watch the live output in your terminal. When a shiny is found, the catch sequence will be printed. The final summary report will be displayed once the simulation is complete.
-
-## Example Output
-
-```
-Encounter #8,192: A wild SHINY Eevee appeared! (Rarity: Rare)
-   -> Throwing a Pokéball... (Total used: 1)
-   Oh no! The Pokémon broke free!
-   -> Throwing a Pokéball... (Total used: 2)
-   GOTCHA! The shiny Eevee was caught!
-
-========================================
-HUNT COMPLETE - FINAL REPORT
-========================================
-Total Simulation Time: 1.23 seconds
-Total Encounters:      8,192
-Total Pokéballs Used:  2
-----------------------------------------
-Shinies Found:   1
-Shinies Caught:  1
-Shinies Fled:    0
-...
-```
+4.  **Stop the Simulation**: To stop the simulation early, press **`Ctrl+C`**. The script is designed to catch this interruption, stop gracefully, and generate the final report based on the progress so far.

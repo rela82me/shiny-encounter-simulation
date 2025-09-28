@@ -72,6 +72,19 @@ SHINY_RATE = (1 / 4096)
 # block changed to markdown so simulation doesn't run. 
 # functions needed: encounter
 
+def attempt_catch(pokemon_name):
+    #simulate an attempt to catch a pokemon based on it's rate.
+    pokemon_data = POKEDEX[pokemon_name]
+    catch_rate = pokemon_data['Catch Rate']
+
+    catch_probability = catch_rate / 255.0
+
+    if rand.random() <= catch_probability:
+        return True #Catch Succesful!
+    else:
+        return False #You lost it you ass
+
+
 def encounter():
     global total_encounter
     total_encounter += 1
@@ -81,11 +94,15 @@ def encounter():
     is_shiny = rand.random() < SHINY_RATE
 
     if is_shiny:
-        shiny_dex.add(encountered_pokemon)
-        shiny_box_counts[encountered_pokemon] = shiny_box_counts.get(
-            encountered_pokemon, 0) + 1
-        print(
-            f"Caught Shiny: {encountered_pokemon}!!! That's the {shiny_box_counts[encountered_pokemon]} shiny of this species! and the {len(shiny_dex)} shiny overall!")
+        if attempt_catch(encountered_pokemon):
+            is_new_shiny = encountered_pokemon not in shiny_dex
+            
+
+            shiny_dex.add(encountered_pokemon)
+            shiny_box_counts[encountered_pokemon] = shiny_box_counts.get(encountered_pokemon, 0) + 1
+
+            if is_new_shiny:
+                print(f"****************************************************************************************************** Gotcha! Shiny {encountered_pokemon}'s been caught!!!")
     else:
         normal_dex.add(encountered_pokemon)
         normal_box_counts[encountered_pokemon] = normal_box_counts.get(
@@ -94,36 +111,51 @@ def encounter():
 
 def output_results():
     # output to terminal
+    print("\n\n" + "="*30)
     print("Simulation Finished!")
-    print(f"Total Encounters: {total_encounter}")
-    print(f"Unique Shiny Pokemon: {shiny_box_counts}")
-    print(f"Unique Normal Pokemon: {normal_box_counts}")
+    print("="*30)
+    print(f"Total Encounters: {total_encounter:,}")
+    print(f"Unique Shiny Pokemon: {len(shiny_box_counts)}")
+    print(f"Unique Normal Pokemon: {len(normal_box_counts)}")
 
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+
+    output_dir = "reports"
+
+    os.makedirs(output_dir, exists_ok=True)
+
+    normal_filepath = f"{output_dir}/normal_encounters_{timestamp}.csv"
+    shiny_filepath = f"{output_dir}/shiny_encounters_{timestamp}.csv"
+    
     # CSV
     normal_df = pd.DataFrame(list(normal_box_counts.items()),
                              columns=['Pokemon', 'Encounters'])
     shiny_df = pd.DataFrame(list(shiny_box_counts.items()),
                             columns=['Pokemon', 'Shiny Encounters'])
 
-    normal_df.to_csv('normal_encounters.csv', index=False)
-    shiny_df.to_csv('shiny_encounters.csv', index=False)
-    print("Successfully saved reports to /normal_encounters.csv and /shiny_encounters.csv")
-
+    normal_df.to_csv(normal_filepath, index=False)
+    shiny_df.to_csv(shiny_filepath, index=False)
+    print(f"Successfully saved reports to {normal_filepath} and {shiny_filepath}")
 
 # While loop to maintain simulation
 # should output in loop which pokemon is being encountered. This will give the user something to look at.
 # Start Encounter > Random Pokemon > Is it Shiny? > If yes: Add to shiny box | If no: Add to regular box > New Encounter
 
 start_time = time.time()
+
 print("Starting Shiny Pokemon Encounter Simulation...")
 print("Press Ctrl+C to stop the simulation early.")
 try:
     while len(shiny_dex) < len(POKEDEX):
         encounter()
         if total_encounter % 1000 == 0:
+            current_time = time.time()
+            current_duration = (current_time - start_time)/60
             percentage_shiny = (len(shiny_dex)/len(POKEDEX)) * 100
             percentage_normal = (len(normal_dex)/len(POKEDEX)) * 100
-            print (f"Encounters: {total_encounter:,} | Shinies Caught: {len(shiny_box_counts)}/ {len(POKEDEX)} ({percentage_shiny:.2f}%) | Normals Caught: {len(normal_box_counts)/len(POKEDEX)} ({percentage_normal:.2f}%)", end='\r')
+            total_shinies = sum(shiny_box_counts.values())
+            total_normals = sum(normal_box_counts.values())
+            print (f"Encounters: {total_encounter:,} | Unique Shinies Caught: {len(shiny_dex)} / {len(POKEDEX)} ({percentage_shiny:.2f}%) | Total Shinies: {total_shinies} | Total Normals: {total_normals} | Total Duration (mins): {current_duration:.2f}", end='\r')
         sys.stdout.flush()
 except KeyboardInterrupt:
     print("\nSimulation stopped by user.")
