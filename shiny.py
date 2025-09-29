@@ -12,6 +12,8 @@ with open('pokedex.json', 'r', encoding='utf-8') as f:
 
 # Create list & Dictionary
 total_encounter = 0
+total_shinies_caught = 0
+total_normals_caught = 0
 
 #Setting up the Data Structures
 
@@ -87,13 +89,12 @@ def attempt_catch(pokemon_name):
 
 
 def encounter():
-    global total_encounter
+    global total_encounter, total_shinies_caught, total_normals_caught
     total_encounter += 1
 
     # Encounter Logic
     encountered_pokemon = rand.choices(pokemon_for_encountering, weights=spawn_weights, k=1)[0]
     is_shiny = rand.random() < SHINY_RATE
-
 
     if is_shiny:
         #1. Attempt to catch first
@@ -116,12 +117,13 @@ def encounter():
         if catch_successful: 
             shiny_dex.add(encountered_pokemon)
             shiny_box_counts[encountered_pokemon] = shiny_box_counts.get(encountered_pokemon, 0) + 1
-
+            total_shinies_caught += 1
             if is_new_shiny:
                 #Print success line/progress updates to the user. 
                 print(f"****************************************************************************************************** Gotcha! Shiny {encountered_pokemon}'s been caught!!! Only {len(POKEDEX)-len(shiny_dex)} left to go!")
 
     else:
+        total_normals_caught += 1
         normal_dex.add(encountered_pokemon)
         normal_box_counts[encountered_pokemon] = normal_box_counts.get(
             encountered_pokemon, 0) + 1
@@ -169,18 +171,18 @@ start_time = time.time()
 
 print("Starting Shiny Pokemon Encounter Simulation...")
 print("Press Ctrl+C to stop the simulation early.")
+
 try:
     while len(shiny_dex) < len(POKEDEX):
-        encounter()
-        if total_encounter % 1000 == 0:
-            current_time = time.time()
-            current_duration = (current_time - start_time)/60
-            percentage_shiny = (len(shiny_dex)/len(POKEDEX)) * 100
-            percentage_normal = (len(normal_dex)/len(POKEDEX)) * 100
-            total_shinies = sum(shiny_box_counts.values())
-            total_normals = sum(normal_box_counts.values())
-            print (f"Encounters: {total_encounter:,} | Unique Shinies Caught: {len(shiny_dex)} / {len(POKEDEX)} ({percentage_shiny:.2f}%) | Total Shinies: {total_shinies} | Total Normals: {total_normals} | Total Duration (mins): {current_duration:.2f}", end='\r')
-        sys.stdout.flush()
+        encounter() # The main encounter function. 
+        if total_encounter % 1000 == 0: #Only display encounter updates every 1000 encounters. 
+            current_time = time.time() # Current Date/Time
+            current_duration = (current_time - start_time)/60 # Time spent in sim. 
+            percentage_shiny = (len(shiny_dex)/len(POKEDEX)) * 100 # Catch progress
+            percentage_normal = (len(normal_dex)/len(POKEDEX)) * 100 # Catch progress
+            # the end='\r' keeps the terminal line at the bottom. 
+            print (f"Encounters: {total_encounter:,} | Unique Shinies Caught: {len(shiny_dex)} / {len(POKEDEX)} ({percentage_shiny:.2f}%) | Total Shinies: {total_shinies_caught} | Total Normals: {total_normals_caught} | Total Duration (mins): {current_duration:.2f}", end='\r')
+        sys.stdout.flush() #This sends out the print once total encounters hits 1000 an interval of
 except KeyboardInterrupt:
     print("\nSimulation stopped by user.")
 
