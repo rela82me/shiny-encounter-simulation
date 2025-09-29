@@ -4,6 +4,7 @@ import pandas as pd
 import json
 import sys
 import time
+import os
 
 # Open data, with proper encoding for weird text doh.
 with open('pokedex.json', 'r', encoding='utf-8') as f:
@@ -63,7 +64,7 @@ normal_dex = set()
 # Create the lists ONLY for counting for the report at the end. The set handles the uniqueness and determining if we "got em all"
 normal_box_counts = {}
 shiny_box_counts = {}
-
+shiny_log = []
 
 
 # Variables/Constants
@@ -93,16 +94,33 @@ def encounter():
     encountered_pokemon = rand.choices(pokemon_for_encountering, weights=spawn_weights, k=1)[0]
     is_shiny = rand.random() < SHINY_RATE
 
-    if is_shiny:
-        if attempt_catch(encountered_pokemon):
-            is_new_shiny = encountered_pokemon not in shiny_dex
-            
 
+    if is_shiny:
+        #1. Attempt to catch first
+        catch_successful = attempt_catch(encountered_pokemon)
+
+        #2. Check for uniqueness after the encounter but before logging. This will tell us if we need a new dex entry. 
+        is_new_shiny = encountered_pokemon not in shiny_dex
+        
+        #3. Create log entry with the complete story of the encounter. 
+        log_entry = {
+            'Encounter_Number': total_encounter,
+            'Pokemon': encountered_pokemon,
+            'Catch_Successful': catch_successful,
+            'Is_New_Shiny': is_new_shiny
+        }
+        shiny_log.append(log_entry)
+
+        #4. Update the simulations state and print message only if the catch is new. 
+
+        if catch_successful: 
             shiny_dex.add(encountered_pokemon)
             shiny_box_counts[encountered_pokemon] = shiny_box_counts.get(encountered_pokemon, 0) + 1
 
             if is_new_shiny:
-                print(f"****************************************************************************************************** Gotcha! Shiny {encountered_pokemon}'s been caught!!!")
+                #Print success line/progress updates to the user. 
+                print(f"****************************************************************************************************** Gotcha! Shiny {encountered_pokemon}'s been caught!!! Only {len(POKEDEX)-len(shiny_dex)} left to go!")
+
     else:
         normal_dex.add(encountered_pokemon)
         normal_box_counts[encountered_pokemon] = normal_box_counts.get(
@@ -122,16 +140,22 @@ def output_results():
 
     output_dir = "reports"
 
-    os.makedirs(output_dir, exists_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     normal_filepath = f"{output_dir}/normal_encounters_{timestamp}.csv"
     shiny_filepath = f"{output_dir}/shiny_encounters_{timestamp}.csv"
-    
+    analysis_filepath = f"{output_dir}/shiny_analysis_log_{timestamp}.csv"
+
+
     # CSV
     normal_df = pd.DataFrame(list(normal_box_counts.items()),
                              columns=['Pokemon', 'Encounters'])
     shiny_df = pd.DataFrame(list(shiny_box_counts.items()),
                             columns=['Pokemon', 'Shiny Encounters'])
+    if shiny_log: #makes sure the list isn't empty. 
+        analysis_df = pd.DataFrame(shiny_log)
+        analysis_df.to_csv(analysis_filepath, index=False)
+        print(f"Successfully saved analysis to {analysis_filepath}")
 
     normal_df.to_csv(normal_filepath, index=False)
     shiny_df.to_csv(shiny_filepath, index=False)
