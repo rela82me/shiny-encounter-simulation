@@ -1,0 +1,58 @@
+# =================================================================
+# User-Specific Ignores
+# =================================================================
+# Ignore the folder containing all generated report files
+reports/
+
+# Ignore the simulation's saved state file
+checkpoint.json
+
+
+# =================================================================
+# Python General
+# =================================================================
+# Byte-compiled / optimized / C-optimized files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+
+# =================================================================
+# Virtual Environments
+# =================================================================
+# Common virtual environment folder names
+.env
+.venv
+env/
+venv/
+ENV/
+VENV/
+
+
+# =================================================================
+# IDE and System Files
+# =================================================================
+# Ignore VS Code specific settings folder
+.vscode/
+
+# Ignore macOS system files
+.DS_Store
