@@ -243,7 +243,13 @@ try:
             
 
             # the end='\r' keeps the terminal line at the bottom. 
-            print (f" Encounters: {total_encounter:,} ({encounters_per_second:.1f} EPS) | Unique Shinies Caught: {len(shiny_dex)} / {len(POKEDEX)} ({percentage_shiny:.2f}%) | Total Shinies: {total_shinies_caught} ({shinies_per_second:.2f} SPS) | Total Normals: {total_normals_caught} | Total Duration (mins): {current_duration_mins:.2f}", end='\r')
+            print (
+                f" Encounters: {total_encounter:,} ({encounters_per_second:.1f} EPS) | "
+                f"Unique Shinies Caught: {len(shiny_dex)} / {len(POKEDEX)} ({percentage_shiny:.2f}%) | "
+                f"Total Shinies: {total_shinies_caught} ({shinies_per_second:.2f} SPS) | "
+                f"Total Normals: {total_normals_caught} | Total Duration (mins): {current_duration_mins:.2f}", 
+                end='\r'
+            )
         
         sys.stdout.flush() #This sends out the print once total encounters hits 1000 an interval of
 except KeyboardInterrupt:
