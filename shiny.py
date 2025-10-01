@@ -120,7 +120,7 @@ def encounter():
             total_shinies_caught += 1
             if is_new_shiny:
                 #Print success line/progress updates to the user. 
-                catch_timestamp = time.strftime("%Y-%m-%d %h:%M:%S")
+                catch_timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
                 print(f"{catch_timestamp} - Gotcha! Shiny ✨{encountered_pokemon}'s✨ been caught!!! Only {len(POKEDEX)-len(shiny_dex)} left to go! ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨ ")
 
     else:
@@ -168,15 +168,66 @@ def output_results():
 # should output in loop which pokemon is being encountered. This will give the user something to look at.
 # Start Encounter > Random Pokemon > Is it Shiny? > If yes: Add to shiny box | If no: Add to regular box > New Encounter
 
+def save_checkpoint():
+    #bundles all critical files into a dictionary and saved to a JSON.
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    state = {
+        'total_encounter': total_encounter,
+        'total_shinies_caught': total_shinies_caught,
+        'total_normals_caught': total_normals_caught,
+        'shiny_dex': list(shiny_dex),
+        'normal_dex': list(normal_dex),
+        'shiny_box_counts': shiny_box_counts,
+        'normal_box_counts': normal_box_counts,
+        'shiny_log': shiny_log,
+        'start_time': start_time,
+    }
+
+    with open('checkpoint.json', 'w') as f:
+        json.dump(state, f, indent=4)
+
+        print(f"{timestamp} --- 💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾 Checkpoint Saved! 💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾💾 ---")
+
+def load_checkpoint():
+    #Checks for a checkpoint file and loads the simulation state if it already exists.
+
+    global total_encounter, total_shinies_caught, total_normals_caught, shiny_dex, shiny_box_counts, normal_box_counts, shiny_log, start_time
+
+    try:
+        with open('checkpoint.json', 'r') as f:
+            state = json.load(f)
+
+            total_encounter = state['total_encounter']
+            total_shinies_caught = state['total_shinies_caught']
+            total_normals_caught = state['total_normals_caught']
+            shiny_dex = set(state['shiny_dex'])
+            normal_dex = set(state['normal_dex'])
+            shiny_box_counts = state['shiny_box_counts']
+            normal_box_counts = state['normal_box_counts']
+            shiny_log = state['shiny_log']
+            start_time = state['start_time']
+
+            print(" --- 💾Checkpoint Loaded! Resuming Simulation💾... ---")
+
+    except FileNotFoundError:
+        print("--- No Checkpoint found. Starting a new simulation. ---")
+
+
 start_time = time.time()
 
 print("Starting Shiny Pokemon Encounter Simulation...")
 print("Press Ctrl+C to stop the simulation early.")
 
+load_checkpoint()
+
 try:
     while len(shiny_dex) < len(POKEDEX):
         encounter() # The main encounter function. 
-        if total_encounter % 1000 == 0: #Only display encounter updates every 1000 encounters. 
+
+        if total_encounter % 1_000_000 == 0:
+            save_checkpoint()
+
+        if total_encounter % 10_000 == 0: #Only display encounter updates every 1000 encounters. 
 
             current_time = time.time() # Current Date/Time
             elapsed_seconds = current_time - start_time
