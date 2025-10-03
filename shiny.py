@@ -77,7 +77,7 @@ SHINY_RATE = (1 / 4096)
 
 def attempt_catch(pokemon_name):
     #simulate an attempt to catch a pokemon based on it's rate.
-    pokemon_data = POKEDEX[pokemon_name]
+    pokemon_data = POKEDEX[pokemon_name] #returns the dictionary of pokemon data. 
     catch_rate = pokemon_data['Catch Rate']
 
     catch_probability = catch_rate / 255.0
@@ -235,6 +235,7 @@ try:
             current_time = time.time() # Current Date/Time
             elapsed_seconds = current_time - start_time
             current_duration_mins = elapsed_seconds/60 # Time spent in sim. 
+            current_duration_hours = current_duration_mins/60 
             encounters_per_second = total_encounter / elapsed_seconds
             shinies_per_second = total_shinies_caught / elapsed_seconds
             percentage_shiny = (len(shiny_dex)/len(POKEDEX)) * 100 # Catch progress
@@ -243,14 +244,25 @@ try:
             
 
             # the end='\r' keeps the terminal line at the bottom. 
-            print (
-                f"_Encounters: {total_encounter:,} ({encounters_per_second:.1f} EPS) | "
-                f"Unique Shinies Caught: {len(shiny_dex)} / {len(POKEDEX)} ({percentage_shiny:.2f}%) | "
-                f"Total Shinies: {total_shinies_caught} ({shinies_per_second:.2f} SPS) | "
-                f"Total Normals: {total_normals_caught} | Total Duration (mins): {current_duration_mins:.2f} | ",
-                f"Last Checkpoint: {last_checkpoint}", 
-                end='\r'
-            )
+            #two statements to depict proper hours format. 
+            if current_duration_hours > 1:
+                 print (
+                    f"_Encounters: {total_encounter:,} ({encounters_per_second:.1f} EPS) | "
+                    f"Unique Shinies Caught: {len(shiny_dex)} / {len(POKEDEX)} ({percentage_shiny:.2f}%) | "
+                    f"Total Shinies: {total_shinies_caught} ({shinies_per_second:.2f} SPS) | "
+                    f"Total Normals: {total_normals_caught} | Total Duration (Hours): {current_duration_hours:.2f} | ",
+                    f"Last Checkpoint: {last_checkpoint}", 
+                    end='\r'
+                )               
+            else:
+                print (
+                    f"_Encounters: {total_encounter:,} ({encounters_per_second:.1f} EPS) | "
+                    f"Unique Shinies Caught: {len(shiny_dex)} / {len(POKEDEX)} ({percentage_shiny:.2f}%) | "
+                    f"Total Shinies: {total_shinies_caught} ({shinies_per_second:.2f} SPS) | "
+                    f"Total Normals: {total_normals_caught} | Total Duration (mins): {current_duration_mins:.2f} | ",
+                    f"Last Checkpoint: {last_checkpoint}", 
+                    end='\r'
+                )
         
         sys.stdout.flush() #This sends out the print once total encounters hits 1000 an interval of
 except KeyboardInterrupt:
