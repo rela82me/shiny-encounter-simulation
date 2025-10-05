@@ -227,7 +227,7 @@ try:
     while len(shiny_dex) < len(POKEDEX):
         encounter() # The main encounter function. 
 
-        if total_encounter % 1_000_000 == 0: #Saves a checkpoint every million encounters. 
+        if total_encounter % 15_000_000 == 0: #Saves a checkpoint every million encounters. 
             save_checkpoint()
 
         if total_encounter % 10_000 == 0: #Only display encounter updates every 1000 encounters. 
