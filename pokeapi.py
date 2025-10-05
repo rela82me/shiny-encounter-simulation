@@ -135,7 +135,7 @@ def main():
     df = pd.DataFrame(all_pokemon_data)
     
     # Save the DataFrame to a CSV file
-    output_filename = 'pokedex_full_dataset2.csv'
+    output_filename = 'pokedex_full_dataset.csv'
     df.to_csv(output_filename, index=False, encoding='utf-8-sig')
     
     print(f"\nSuccessfully created the dataset!")
@@ -143,4 +143,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
