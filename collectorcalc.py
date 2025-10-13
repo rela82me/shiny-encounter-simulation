@@ -6,14 +6,14 @@ import pandas as pd
 import json
 import os
 
-# --- FILE PATHS ---
+#  FILE PATHS
 # Path to your main simulation's checkpoint file
 CHECKPOINT_PATH = r'C:\Users\rela8\Documents\C VS Code\Project Files\Python Projects\Shiny Encounters\checkpoint.json'
 # Path to your Excel data file
 EXCEL_PATH = r'C:\Users\rela8\Documents\C VS Code\Project Files\Python Projects\Shiny Encounters\Pokemon Stats.xlsx'
 
 
-# --- 1. LOAD AND PROCESS POKEMON DATA (Same as before) ---
+#  1. LOAD AND PROCESS POKEMON DATA 
 try:
     pokedex_df = pd.read_excel(EXCEL_PATH, sheet_name='Pokedex')
 except FileNotFoundError:
@@ -21,12 +21,12 @@ except FileNotFoundError:
     # Exit if we can't load the main data
     exit()
 
-# --- MATCH YOUR SIMULATION PARAMETERS ---
+    #  MATCH SIMULATION PARAMETERS 
 STABILITY_CONSTANT = 100
 RARITY_EXPONENT = 1.8
 SHINY_RATE = 1 / 4096
 
-# Calculate probabilities exactly like your simulation
+    # Calculate probabilities exactly like your simulation
 pokedex_df['Spawn Weight'] = 1 / ((pokedex_df['base total'] + STABILITY_CONSTANT) ** RARITY_EXPONENT)
 total_spawn_weight = pokedex_df['Spawn Weight'].sum()
 pokedex_df['Spawn Probability'] = pokedex_df['Spawn Weight'] / total_spawn_weight
@@ -34,7 +34,7 @@ pokedex_df['Catch Probability'] = pokedex_df['Catch Rate'] / 255
 pokedex_df['p_i'] = pokedex_df['Spawn Probability'] * pokedex_df['Catch Probability'] * SHINY_RATE
 
 
-# --- 2. LOAD LIVE DATA FROM CHECKPOINT.JSON ---
+# 2. LOAD LIVE DATA FROM CHECKPOINT.JSON 
 current_encounters = 0
 shinies_already_caught = set()
 
@@ -52,7 +52,7 @@ except (FileNotFoundError, json.JSONDecodeError):
     pass
 
 
-# --- 3. THE CALCULATION FUNCTION (Same as before) ---
+# 3. THE CALCULATION FUNCTION (Same as before) 
 def calculate_expected_encounters(probabilities):
     """Weighted Coupon Collector's Problem formula."""
     remaining_probabilities = sorted(probabilities, reverse=True)
@@ -69,9 +69,9 @@ def calculate_expected_encounters(probabilities):
     return total_expected_encounters
 
 
-# --- 4. CALCULATE AND DISPLAY THE PREDICTION ---
+#  4. CALCULATE AND DISPLAY THE PREDICTION 
 
-# Filter the DataFrame to get ONLY the shinies you haven't caught yet
+    # Filter the DataFrame to get ONLY the shinies you haven't caught yet
 remaining_shinies_df = pokedex_df[~pokedex_df['name'].isin(shinies_already_caught)]
 remaining_pi_probabilities = remaining_shinies_df['p_i'].tolist()
 
@@ -86,7 +86,7 @@ if not remaining_shinies_df.empty:
     print("\n--- Top 5 Hardest Remaining Shinies (based on your model) ---")
     print(remaining_shinies_df.nsmallest(5, 'p_i')[['name', 'base total', 'p_i']])
 
-# Calculate the expected encounters needed for ONLY the remaining shinies
+    # Calculate the expected encounters needed for ONLY the remaining shinies
 expected_encounters_remaining = calculate_expected_encounters(remaining_pi_probabilities)
 
 print("\n" + "=" * 60)
@@ -96,7 +96,7 @@ print(f"Current Encounters (from checkpoint): {current_encounters:,}")
 print(f"Expected ADDITIONAL Encounters Needed: {expected_encounters_remaining:,.0f}")
 print(f"Your simulation is expected to finish at ~{current_encounters + expected_encounters_remaining:,.0f} total encounters.")
 
-# Time estimate
+    # Time estimate
 EPS = 31736.2  # Your actual Encounters Per Second from the simulation
 time_remaining_seconds = expected_encounters_remaining / EPS
 time_remaining_hours = time_remaining_seconds / 3600
