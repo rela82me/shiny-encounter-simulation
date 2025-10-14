@@ -1,0 +1,158 @@
+{
+    "name": "Pokemon - Pallet Town Night",
+    "$schema": "https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.143.json",
+    "dataColors": [
+        "#FACC15", 
+        "#EE1515", 
+        "#3B82F6", 
+        "#10B981", 
+        "#F97316", 
+        "#8B5CF6", 
+        "#EC4899", 
+        "#64748B"
+    ],
+    "textClasses": {
+        "callout": {
+            "color": "#F1F5F9",
+            "fontFace": "Segoe UI Semibold"
+        },
+        "header": {
+            "color": "#F1F5F9",
+            "fontFace": "Segoe UI Semibold"
+        },
+        "label": {
+            "color": "#CBD5E1",
+            "fontFace": "'Segoe UI', wf_segoe-ui_light, helvetica, arial, sans-serif"
+        },
+        "title": {
+            "color": "#FACC15",
+            "fontFace": "Segoe UI Bold"
+        }
+    },
+    "bad": "#EE1515",
+    "neutral": "#64748B",
+    "good": "#10B981",
+    "background": "#334155",
+    "foreground": "#F1F5F9",
+    "tableAccent": "#3B82F6",
+    "visualStyles": {
+        "*": {
+            "*": {
+                "background": [
+                    {
+                        "color": {
+                            "solid": {
+                                "color": "#334155"
+                            }
+                        },
+                        "transparency": 0
+                    }
+                ],
+                "border": [
+                    {
+                        "show": false
+                    }
+                ],
+                "dropShadow": [
+                    {
+                        "show": false
+                    }
+                ],
+                "categoryAxis": [
+                    {
+                        "labelColor": {
+                            "solid": {
+                                "color": "#CBD5E1"
+                            }
+                        }
+                    }
+                ],
+                "valueAxis": [
+                    {
+                        "labelColor": {
+                            "solid": {
+                                "color": "#CBD5E1"
+                            }
+                        },
+                        "gridlineColor": {
+                            "solid": {
+                                "color": "#FFFFFF33"
+                            }
+                        },
+                        "gridlineShow": true,
+                        "gridlineStyle": "dotted"
+                    }
+                ],
+                "legend": [
+                    {
+                        "labelColor": {
+                            "solid": {
+                                "color": "#F1F5F9"
+                            }
+                        },
+                         "titleColor": {
+                            "solid": {
+                                "color": "#F1F5F9"
+                            }
+                        }
+                    }
+                ],
+                "outspacePane": [
+                    {
+                        "backgroundColor": {
+                            "solid": {
+                                "color": "#1E293B"
+                            }
+                        },
+                        "foregroundColor": {
+                            "solid": {
+                                "color": "#F1F5F9"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "page": {
+            "*": {
+                "background": [
+                    {
+                        "color": {
+                            "solid": {
+                                "color": "#1E293B"
+                            }
+                        },
+                        "transparency": 0
+                    }
+                ]
+            }
+        },
+        "slicer": {
+            "*": {
+                "items": [
+                    {
+                        "background": {
+                            "solid": {
+                                "color": "#1E293B"
+                            }
+                        },
+                        "color": {
+                            "solid": {
+                                "color": "#F1F5F9"
+                            }
+                        }
+                    }
+                ],
+                "header": [
+                    {
+                        "fontColor": {
+                            "solid": {
+                                "color": "#FACC15"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
