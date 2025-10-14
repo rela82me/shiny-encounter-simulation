@@ -1,44 +1,9 @@
 {
     "runs": {
-        "NewSim": {
-            "shiny_modifier": "both",
-            "guaranteed_catch": true,
-            "last_updated": "2025-10-13T21:21:53.286588",
-            "checkpoint_path": "reports\\NewSim\\checkpoint.json",
-            "reports_dir": "reports\\NewSim"
-        },
-        "NewDataTest": {
-            "shiny_modifier": "both",
-            "guaranteed_catch": true,
-            "last_updated": "2025-10-13T21:43:00.672916",
-            "checkpoint_path": "reports\\NewDataTest\\checkpoint.json",
-            "reports_dir": "reports\\NewDataTest"
-        },
-        "SimResultsTest": {
-            "shiny_modifier": "both",
-            "guaranteed_catch": true,
-            "last_updated": "2025-10-13T21:56:49.353800",
-            "checkpoint_path": "reports\\SimResultsTest\\checkpoint.json",
-            "reports_dir": "reports\\SimResultsTest"
-        },
-        "improvedoutput": {
-            "shiny_modifier": "both",
-            "guaranteed_catch": true,
-            "last_updated": "2025-10-13T22:25:53.488268",
-            "checkpoint_path": "reports\\improvedoutput\\checkpoint.json",
-            "reports_dir": "reports\\improvedoutput"
-        },
-        "progressbartest": {
-            "shiny_modifier": "both",
-            "guaranteed_catch": true,
-            "last_updated": "2025-10-13T22:44:54.923508",
-            "checkpoint_path": "reports\\progressbartest\\checkpoint.json",
-            "reports_dir": "reports\\progressbartest"
-        },
         "Baseline": {
             "shiny_modifier": "standard",
             "guaranteed_catch": false,
-            "last_updated": "2025-10-13T22:58:25.724802",
+            "last_updated": "2025-10-13T23:12:12.254783",
             "checkpoint_path": "reports\\Baseline\\checkpoint.json",
             "reports_dir": "reports\\Baseline"
         }

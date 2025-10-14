@@ -15,7 +15,7 @@ class ShinySimulation:
     """
     
     # Class-level constants
-    RUN_REGISTRY = 'run_registry.json'
+    RUN_REGISTRY = 'reports/run_registry.json'
     MASTER_RESULTS = 'simulation_results.csv'
     TIMELINE_LOG_INTERVAL = 5000  # Log timeline every 5k encounters
 

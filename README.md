@@ -29,13 +29,14 @@ For a detailed breakdown of the project's journey, the key insights from the dat
 
 ## Key Features
 
-- **Data-Driven**: All Pokémon stats are sourced from external `.csv` files or generated via the PokéAPI.
-- **Weighted Encounters**: Pokémon spawn rates are weighted based on their in-game "Experience Type" (e.g., Slow, Fast), ensuring a realistic distribution of encounters.
-- **Catch Mechanics**: Each shiny encounter triggers a catch attempt based on the Pokémon's specific catch rate, adding another layer of probability.
-- **Robust Checkpointing**: The simulation automatically saves its state to a `checkpoint.json` file, allowing it to resume seamlessly after interruptions.
-- **Detailed Data Logging**: Every single shiny encounter is recorded in `shiny_analysis_log.csv`, designed for in-depth analysis in tools like Power BI.
-- **Optimized for Performance**: The main loop is highly optimized to ensure the simulation can run for billions of encounters efficiently.
-- **Live Progress Tracking**: A clean progress bar in the terminal provides real-time updates.
+- **Interactive Run Management**: On startup, the script lists all previous simulation runs, allowing you to seamlessly resume a paused session or start a new one with a custom name.
+- **Live ETA Prediction**: Implements the **Weighted Coupon Collector's Problem** formula to provide a theoretical prediction of the total encounters and runtime before the simulation even begins. This ETA is dynamically updated as the simulation progresses.
+- **Configurable Simulation Parameters**: Interactively configure the shiny rate (Standard, Charm, Masuda, or Both) and catch mechanics (Normal or Guaranteed 100% Catch Rate) for each new run.
+- **Robust Checkpointing**: Automatically saves progress to a `checkpoint.json` file, ensuring no data is lost. Pausing with `Ctrl+C` will safely save the state before exiting.
+- **Detailed, Run-Specific Reporting**: Each simulation run generates its own folder containing detailed logs, including a complete encounter summary, a shiny analysis log, and a timeline log for time-series analysis.
+- **Master Results Tracking**: A top-level `simulation_results.csv` file is maintained, allowing for easy comparison of the outcomes of different simulation runs.
+- **Weighted Encounters**: Pokémon spawn rates are weighted based on their Base Stat Total, ensuring a more realistic distribution of encounters.
+- **Performance Optimized**: The core encounter loop is designed for efficiency, capable of processing tens of thousands of encounters per second.
 
 ![Catch Rate Analysis](./Images/Catch%20Rate.jpg)
 
@@ -43,40 +44,39 @@ For a detailed breakdown of the project's journey, the key insights from the dat
 
 ## How It Works
 
-The project is split into several Python scripts:
+The project is driven by `simulator.py`, the main simulation engine.
 
-1.  **`pokeapi.py` (Primary Data Generation)**: This is a comprehensive script that connects to the PokéAPI, fetches detailed data for every Pokémon (stats, types, Pokédex entries, evolution info, etc.), and saves it into a clean `pokedex_full_dataset.csv`. This is the recommended source for the most complete data.
+1.  **Data Source**: The simulator loads Pokémon data, including Base Stats and Catch Rates, from the `Pokemon Stats.xlsx` file. A utility script, `pokeapi.py`, is also included to generate a more comprehensive dataset from the PokéAPI if needed.
 
-2.  **`makejsonlist.py` (Data Preparation)**: This is a legacy utility that reads from a raw `Stats.csv` file and generates the `pokedex.json` file used by the simulator.
+2.  **Interactive Setup**: When you run `simulator.py`, it first checks for a `run_registry.json`.
 
-3.  **`shiny.py` (The Simulator)**:
-    - On startup, it looks for `checkpoint.json` to resume a previous run.
-    - If no checkpoint is found, it starts a new simulation.
-    - The main loop runs until a shiny version of every Pokémon has been successfully caught, simulating encounters, shiny checks, and catch attempts.
+    - If existing runs are found, it prompts you to either resume a previous run or start a new one.
+    - For new runs, it guides you through setting a name, shiny rate, and catch mode.
+
+3.  **Simulation Loop**:
+    - The script loads the state from a `checkpoint.json` file if resuming, or starts fresh.
+    - It enters a high-speed loop, simulating one encounter at a time based on weighted probabilities.
+    - The simulation continues until a shiny version of every Pokémon in the dataset has been successfully caught.
 
 ## How to Run
 
-1.  **Install Dependencies**: Ensure you have the required Python libraries.
+1.  **Install Dependencies**: Ensure you have Pandas and Openpyxl installed.
 
     ```bash
-    pip install pandas requests tqdm
+    pip install pandas openpyxl
     ```
 
-2.  **(Optional but Recommended) Generate Full Pokémon Dataset**:
-
-    ```bash
-    python pokeapi.py
-    ```
+2.  **Prepare Data**: Make sure the `Pokemon Stats.xlsx` file is in the same directory as the script.
 
 3.  **Run the Simulation**:
 
     ```bash
-    python shiny.py
+    python simulator.py
     ```
 
-    - To start a fresh simulation, delete the `checkpoint.json` file.
+4.  **Follow the Prompts**: Use the interactive menu to resume a previous run or configure and start a new one.
 
-4.  **Stop the Simulation**: To stop early, press **`Ctrl+C`**. The script will save a final checkpoint and generate the report files with the progress so far.
+5.  **Stop the Simulation**: To stop early, press **`Ctrl+C`**. The script will perform a final save of its checkpoint and generate reports with the progress so far.
 
 ---
 
@@ -84,13 +84,17 @@ The project is split into several Python scripts:
 
 ## Generated Files
 
-The scripts will generate the following files:
+The scripts will generate the following files and directories:
 
-- **`pokedex_full_dataset.csv`**: The complete, rich dataset of all Pokémon stats and lore from the PokéAPI.
-- **`shiny_analysis_log_{timestamp}.csv`**: The most important file for analysis. Contains a detailed log of every shiny encounter from the simulation.
-- **`shiny_encounters_{timestamp}.csv`**: A summary of how many times each unique shiny species was _caught_.
-- **`normal_encounters_{timestamp}.csv`**: A summary of how many times each normal Pokémon was encountered.
-- **`checkpoint.json`**: The file containing the saved state of the simulation.
+- **`reports/`**: The main directory for all simulation outputs.
+  - **`run_registry.json`**: A master file that keeps track of all simulation runs.
+  - **`simulation_results.csv`**: A master CSV comparing the final results of all runs.
+  - **`[run_name]/`**: A dedicated directory is created for each simulation run, containing:
+    - **`checkpoint.json`**: The saved state of the simulation for this run.
+    - **`encounter_summary.csv`**: A detailed, per-Pokémon breakdown of all encounter stats (normal vs. shiny, variance, first/last catch times).
+    - **`shiny_analysis_log.csv`**: The raw log of every single shiny encounter, whether it was caught or missed.
+    - **`encounter_timeline.csv`**: A log of simulation stats at regular intervals, perfect for time-series analysis.
+    - **`simulation_results.csv`**: A summary report specific to this individual run.
 
 ---
 
